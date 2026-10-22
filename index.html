@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cosmo Velocity 3D — Cyberpunk Odyssey</title>
+  <meta name="description" content="A futuristic 3D cyberpunk racer with customizable vehicles (Cyber Car, Tron Bike, Space Ship), levels, warp portals, and synthwave music.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Three.js & GLTFLoader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+
+  <!-- Fullscreen 3D Game Canvas -->
+  <div id="gameCanvasContainer"></div>
+
+  <!-- HUD Overlay (Active during gameplay) -->
+  <div id="gameHUD" class="hud-overlay">
+    <div class="hud-top-bar">
+      
+      <!-- Current Level Badge -->
+      <div class="hud-stat-box level-box">
+        <span class="hud-label">ZONE</span>
+        <span id="hudLevelName" class="hud-value neon-pink">LVL 1: NEO CITY</span>
+      </div>
+
+      <div class="hud-stat-box score-box">
+        <span class="hud-label">SCORE</span>
+        <span id="hudScore" class="hud-value glow-text">0</span>
+      </div>
+
+      <div class="hud-stat-box mult-box">
+        <span class="hud-label">COMBO</span>
+        <span id="hudMultiplier" class="hud-value neon-cyan">1.0x</span>
+      </div>
+
+      <div class="hud-stat-box crystal-box">
+        <span class="hud-label">CRYSTALS</span>
+        <span id="hudCrystals" class="hud-value neon-gold">0</span>
+      </div>
+
+      <div class="hud-stat-box dist-box">
+        <span class="hud-label">GOAL</span>
+        <span id="hudDistance" class="hud-value">0 / 800m</span>
+      </div>
+
+      <div class="hud-actions">
+        <button id="muteBtn" class="hud-btn" title="Toggle Sound">🔊 Sound</button>
+      </div>
+
+    </div>
+
+    <!-- Powerup & Nitro Gauge Bar -->
+    <div class="hud-sub-bar">
+      <div class="nitro-gauge-wrap">
+        <div class="nitro-label">⚡ NITRO</div>
+        <div class="nitro-bar-bg">
+          <div id="nitroBarFill" class="nitro-bar-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+      <div class="powerup-bar">
+        <div id="badgeShield" class="powerup-badge badge-shield">🛡️ SHIELD ACTIVE</div>
+        <div id="badgeMagnet" class="powerup-badge badge-magnet">🧲 MAGNET ON</div>
+        <div id="badgeBoost" class="powerup-badge badge-boost">🚀 HYPER BOOST</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Menu Modal -->
+  <div id="startScreen" class="overlay-modal">
+    <div class="modal-card">
+      <div class="game-tag">CYBERPUNK VEHICLE ODYSSEY</div>
+      <h1 class="game-logo">COSMO <span class="logo-3d">VELOCITY</span> 3D</h1>
+      <p class="game-desc">
+        Select your futuristic ride, blast through Cyber City, and jump through Warp Portals to reach outer space!
+      </p>
+
+      <!-- Active Vehicle Preview Bar -->
+      <div class="active-vehicle-card" id="openGarageBtn">
+        <div class="vehicle-icon-wrap" id="activeVehicleIcon">🐆</div>
+        <div class="vehicle-info-wrap">
+          <div class="vehicle-mini-label">ACTIVE RIDE (3D ANIMAL)</div>
+          <div class="vehicle-mini-name" id="activeVehicleName">CYBER MECHA PANTHER</div>
+        </div>
+        <button class="btn-change-vehicle">GARAGE ➔</button>
+      </div>
+
+      <div class="controls-guide">
+        <div class="ctrl-item">
+          <span class="key-badge">A / D</span> or <span class="key-badge">◀ ▶</span>
+          <span class="ctrl-desc">Dodge Lanes</span>
+        </div>
+        <div class="ctrl-item">
+          <span class="key-badge">W / Space</span> or <span class="key-badge">▲</span>
+          <span class="ctrl-desc">Jump Barrier</span>
+        </div>
+        <div class="ctrl-item">
+          <span class="key-badge">Shift / Nitro</span>
+          <span class="ctrl-desc">Hyper Nitro Boost</span>
+        </div>
+        <div class="ctrl-item mobile-hint-row">
+          <span class="key-badge">📱 Mobile</span>
+          <span class="ctrl-desc">Virtual Gamepad & Swipes</span>
+        </div>
+      </div>
+
+      <div class="menu-btn-row">
+        <button id="startBtn" class="btn-play">
+          <span>START RUN</span>
+          <div class="btn-glow"></div>
+        </button>
+        <button id="garageMenuBtn" class="btn-garage-alt">
+          <span>🛠️ VEHICLES</span>
+        </button>
+      </div>
+      <div class="hint-text">Press <strong>SPACE</strong> to Launch</div>
+    </div>
+  </div>
+
+  <!-- Garage / Vehicle Selection Modal -->
+  <div id="garageModal" class="overlay-modal hidden">
+    <div class="modal-card garage-card">
+      <div class="garage-header">
+        <h2 class="garage-title">CYBER GARAGE</h2>
+        <button id="closeGarageBtn" class="btn-close-modal">×</button>
+      </div>
+      <p class="garage-subtitle">Choose your ride — High-Tech Cyber Animals, Bikes & Supercars:</p>
+
+      <div class="vehicle-selection-grid">
+        
+        <!-- Vehicle 0: Cyber Animal Panther -->
+        <div class="vehicle-card active" data-vehicle="animal">
+          <div class="veh-icon">🐆</div>
+          <h3 class="veh-title">CYBER PANTHER</h3>
+          <p class="veh-desc">Robotic predatory cheetah with rocket boosters & pouncing leaps.</p>
+          <div class="veh-stats">
+            <div class="stat-row"><span>Speed:</span> <strong>112%</strong></div>
+            <div class="stat-row"><span>Reflexes:</span> <strong class="neon-cyan">Beast Mode</strong></div>
+            <div class="stat-row"><span>Perk:</span> <em>High Pounce Jump</em></div>
+          </div>
+          <button class="btn-select-veh active">SELECTED</button>
+        </div>
+
+        <!-- Vehicle 1: Cyberbike -->
+        <div class="vehicle-card" data-vehicle="bike">
+          <div class="veh-icon">🏍️</div>
+          <h3 class="veh-title">TRON CYBERBIKE</h3>
+          <p class="veh-desc">Hubless glowing wheels & ultra-nimble steering.</p>
+          <div class="veh-stats">
+            <div class="stat-row"><span>Speed:</span> <strong>108%</strong></div>
+            <div class="stat-row"><span>Handling:</span> <strong class="neon-cyan">Ultra Agile</strong></div>
+            <div class="stat-row"><span>Perk:</span> <em>Quick Lane Lerp</em></div>
+          </div>
+          <button class="btn-select-veh">SELECT</button>
+        </div>
+
+        <!-- Vehicle 2: Cybercar -->
+        <div class="vehicle-card" data-vehicle="car">
+          <div class="veh-icon">🏎️</div>
+          <h3 class="veh-title">CYBER SUPERCAR</h3>
+          <p class="veh-desc">Armored aerodynamic wedge with dual rocket thrusters.</p>
+          <div class="veh-stats">
+            <div class="stat-row"><span>Speed:</span> <strong>100%</strong></div>
+            <div class="stat-row"><span>Shield:</span> <strong class="neon-pink">Armor Plated</strong></div>
+            <div class="stat-row"><span>Perk:</span> <em>Free Shield on Start</em></div>
+          </div>
+          <button class="btn-select-veh">SELECT</button>
+        </div>
+
+        <!-- Vehicle 3: Cosmo Ship -->
+        <div class="vehicle-card" data-vehicle="ship">
+          <div class="veh-icon">🛸</div>
+          <h3 class="veh-title">COSMO RACER</h3>
+          <p class="veh-desc">Anti-gravity hover ship with extended airtime float.</p>
+          <div class="veh-stats">
+            <div class="stat-row"><span>Speed:</span> <strong>104%</strong></div>
+            <div class="stat-row"><span>Jump:</span> <strong class="neon-gold">High Float</strong></div>
+            <div class="stat-row"><span>Perk:</span> <em>Extended Airtime</em></div>
+          </div>
+          <button class="btn-select-veh">SELECT</button>
+        </div>
+
+      </div>
+
+      <button id="confirmVehicleBtn" class="btn-play">CONFIRM & RIDE</button>
+    </div>
+  </div>
+
+  <!-- Level Complete / Warp Modal -->
+  <div id="levelClearModal" class="overlay-modal hidden">
+    <div class="modal-card warp-card">
+      <div class="warp-tag">WARP PORTAL ENGAGED</div>
+      <h2 class="warp-title">ZONE COMPLETED! 🎉</h2>
+      <p id="warpDescText" class="warp-desc">Entering Orbital Space Station...</p>
+      
+      <div class="warp-bonus-box">
+        <span>WARP BONUS</span>
+        <strong id="warpBonusScore">+1,000 PTS</strong>
+      </div>
+
+      <button id="nextLevelBtn" class="btn-play btn-warp">
+        <span>ENTER NEXT ZONE ➔</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div id="gameOverScreen" class="overlay-modal hidden">
+    <div class="modal-card game-over-card">
+      <div class="game-over-tag">HULL INTEGRITY COMPROMISED</div>
+      <h2 class="game-over-title">MISSION OVER</h2>
+
+      <div class="stats-summary-grid">
+        <div class="stat-card">
+          <span class="stat-card-label">FINAL SCORE</span>
+          <span id="finalScoreVal" class="stat-card-val glow-cyan">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-label">DISTANCE</span>
+          <span id="finalDistanceVal" class="stat-card-val">0m</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-label">CRYSTALS</span>
+          <span id="finalCrystalsVal" class="stat-card-val glow-gold">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-label">BEST RECORD</span>
+          <span id="bestScoreVal" class="stat-card-val glow-pink">0</span>
+        </div>
+      </div>
+
+      <div class="menu-btn-row">
+        <button id="restartBtn" class="btn-play btn-restart">
+          <span>PLAY AGAIN</span>
+          <div class="btn-glow"></div>
+        </button>
+        <button id="garageAfterLossBtn" class="btn-garage-alt">
+          <span>🛠️ GARAGE</span>
+        </button>
+      </div>
+      <div class="hint-text">Press <strong>SPACE</strong> or <strong>R</strong> to Restart</div>
+    </div>
+  </div>
+
+  <!-- Pause Modal -->
+  <div id="pauseOverlay" class="overlay-modal hidden">
+    <div class="modal-card pause-card">
+      <h2>GAME PAUSED</h2>
+      <button id="resumeBtn" class="btn-play">RESUME FLIGHT</button>
+    </div>
+  </div>
+
+  <!-- Mobile Virtual Gamepad (Steering & Action Buttons) -->
+  <div id="mobileControls" class="mobile-controls">
+    <div class="mobile-dpad">
+      <button id="touchLeftBtn" class="touch-btn touch-btn-nav" aria-label="Steer Left">◀</button>
+      <button id="touchRightBtn" class="touch-btn touch-btn-nav" aria-label="Steer Right">▶</button>
+    </div>
+    <div class="mobile-actions">
+      <button id="touchSlideBtn" class="touch-btn touch-btn-slide" aria-label="Duck or Slide">▼ SLIDE</button>
+      <button id="touchJumpBtn" class="touch-btn touch-btn-jump" aria-label="Jump">▲ JUMP</button>
+      <button id="touchNitroBtn" class="touch-btn touch-btn-nitro" aria-label="Nitro Boost">⚡ NITRO</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
