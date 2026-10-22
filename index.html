@@ -82,10 +82,10 @@
 
       <!-- Active Vehicle Preview Bar -->
       <div class="active-vehicle-card" id="openGarageBtn">
-        <div class="vehicle-icon-wrap" id="activeVehicleIcon">🐆</div>
+        <div class="vehicle-icon-wrap" id="activeVehicleIcon">🐅</div>
         <div class="vehicle-info-wrap">
-          <div class="vehicle-mini-label">ACTIVE RIDE (3D ANIMAL)</div>
-          <div class="vehicle-mini-name" id="activeVehicleName">CYBER MECHA PANTHER</div>
+          <div class="vehicle-mini-label">ACTIVE OBJECT (REAL 3D ANIMAL)</div>
+          <div class="vehicle-mini-name" id="activeVehicleName">ROYAL BENGAL TIGER</div>
         </div>
         <button class="btn-change-vehicle">GARAGE ➔</button>
       </div>
@@ -115,7 +115,7 @@
           <div class="btn-glow"></div>
         </button>
         <button id="garageMenuBtn" class="btn-garage-alt">
-          <span>🛠️ VEHICLES</span>
+          <span>🛠️ GARAGE</span>
         </button>
       </div>
       <div class="hint-text">Press <strong>SPACE</strong> to Launch</div>
@@ -126,24 +126,37 @@
   <div id="garageModal" class="overlay-modal hidden">
     <div class="modal-card garage-card">
       <div class="garage-header">
-        <h2 class="garage-title">CYBER GARAGE</h2>
+        <h2 class="garage-title">CYBER & WILD GARAGE</h2>
         <button id="closeGarageBtn" class="btn-close-modal">×</button>
       </div>
-      <p class="garage-subtitle">Choose your ride — High-Tech Cyber Animals, Bikes & Supercars:</p>
+      <p class="garage-subtitle">Choose your ride — Real Organic Animals, Cyber Beasts & Supercars:</p>
 
       <div class="vehicle-selection-grid">
         
+        <!-- Vehicle: Real Animal Tiger -->
+        <div class="vehicle-card active" data-vehicle="real_tiger">
+          <div class="veh-icon">🐅</div>
+          <h3 class="veh-title">REAL TIGER</h3>
+          <p class="veh-desc">Royal Bengal Tiger with realistic striped fur, white chest & wild paws.</p>
+          <div class="veh-stats">
+            <div class="stat-row"><span>Speed:</span> <strong>115%</strong></div>
+            <div class="stat-row"><span>Reflexes:</span> <strong class="neon-gold">Jungle King</strong></div>
+            <div class="stat-row"><span>Perk:</span> <em>Wild Predator Leap</em></div>
+          </div>
+          <button class="btn-select-veh active">SELECTED</button>
+        </div>
+
         <!-- Vehicle 0: Cyber Animal Panther -->
-        <div class="vehicle-card active" data-vehicle="animal">
+        <div class="vehicle-card" data-vehicle="animal">
           <div class="veh-icon">🐆</div>
           <h3 class="veh-title">CYBER PANTHER</h3>
           <p class="veh-desc">Robotic predatory cheetah with rocket boosters & pouncing leaps.</p>
           <div class="veh-stats">
             <div class="stat-row"><span>Speed:</span> <strong>112%</strong></div>
             <div class="stat-row"><span>Reflexes:</span> <strong class="neon-cyan">Beast Mode</strong></div>
-            <div class="stat-row"><span>Perk:</span> <em>High Pounce Jump</em></div>
+            <div class="stat-row"><span>Perk:</span> <em>Rocket Pounce</em></div>
           </div>
-          <button class="btn-select-veh active">SELECTED</button>
+          <button class="btn-select-veh">SELECT</button>
         </div>
 
         <!-- Vehicle 1: Cyberbike -->

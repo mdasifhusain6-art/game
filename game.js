@@ -8,6 +8,28 @@
 const LANES = [-3.2, 0, 3.2];
 
 const VEHICLE_CONFIGS = {
+  real_tiger: {
+    name: 'ROYAL BENGAL TIGER',
+    icon: '🐅',
+    modelKey: 'real_animal_tiger',
+    speedMult: 1.15,
+    lerpSpeed: 21.0, // Wild beast agility
+    jumpForce: 0.48, // Pouncing predator leap!
+    scale: [0.85, 0.85, 0.85],
+    yOffset: 0.42,
+    hasStartShield: false
+  },
+  animal: {
+    name: 'CYBER MECHA PANTHER',
+    icon: '🐆',
+    modelKey: 'vehicle_animal',
+    speedMult: 1.12,
+    lerpSpeed: 20.0, // Beast reflexes!
+    jumpForce: 0.46, // Pouncing predator leap!
+    scale: [0.92, 0.92, 0.92],
+    yOffset: 0.42,
+    hasStartShield: false
+  },
   bike: {
     name: 'TRON CYBERBIKE',
     icon: '🏍️',
@@ -86,8 +108,8 @@ class Game {
     this.highScore = parseInt(localStorage.getItem('cosmo_velocity_high') || '0', 10);
     this.currentLevelIdx = 0;
     
-    // Vehicle Selection
-    this.selectedVehicle = 'bike';
+    // Object Selection (Real Royal Bengal Tiger by default!)
+    this.selectedVehicle = 'real_tiger';
     this.vehConfig = VEHICLE_CONFIGS[this.selectedVehicle];
 
     // Speeds
@@ -242,6 +264,8 @@ class Game {
   loadAllAssets() {
     const loader = new THREE.GLTFLoader();
     const assetList = [
+      { key: 'real_animal_tiger', url: 'assets/real_animal_tiger.glb' },
+      { key: 'vehicle_animal', url: 'assets/vehicle_animal.glb' },
       { key: 'vehicle_bike', url: 'assets/vehicle_bike.glb' },
       { key: 'vehicle_car', url: 'assets/vehicle_car.glb' },
       { key: 'player', url: 'assets/player.glb' },
@@ -991,6 +1015,13 @@ class Game {
         }
       }
       this.playerRoot.position.y = this.playerY;
+
+      // Real Animal Tiger & Panther Gallop Stride Oscillation
+      if ((this.selectedVehicle === 'real_tiger' || this.selectedVehicle === 'animal') && !this.isJumping && this.currentVehicleMesh) {
+        const strideSpeed = this.selectedVehicle === 'real_tiger' ? 0.024 : 0.02;
+        this.currentVehicleMesh.position.y = Math.sin(Date.now() * strideSpeed) * 0.06;
+        this.currentVehicleMesh.rotation.x = Math.sin(Date.now() * strideSpeed) * 0.045;
+      }
 
       // Slide recovery
       if (this.isSliding) {
